@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Org Design by the Numbers — Menu Tech Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --teal: #006b6b;
+    --teal-deep: #004e52;
+    --teal-dark: #003438;
+    --olive: #8a9a2f;
+    --olive-deep: #6b7a22;
+    --slate: #3a4148;
+    --slate-2: #5a6168;
+    --slate-light: #8a9199;
+    --cream: #f4f1e8;
+    --cream-2: #ece7d8;
+    --ink: #1a1d20;
+    --white: #ffffff;
+    --accent: #d97706;
+    --red: #b91c1c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter Tight', sans-serif;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* Subtle paper grain */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px);
+    background-size: 3px 3px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .shell {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 36px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===== HEADER ===== */
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    margin-bottom: 28px;
+  }
+  .brandmark {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .brandmark .bar {
+    width: 40px; height: 4px; background: var(--teal); border-radius: 2px;
+  }
+  .brandmark .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--slate);
+    font-weight: 500;
+  }
+  .crumbs {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--slate-light);
+  }
+  .crumbs b { color: var(--ink); font-weight: 700; }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(40px, 5vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin: 12px 0 4px;
+    color: var(--ink);
+  }
+  h1.title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--teal);
+  }
+  .subtitle {
+    font-size: 14px;
+    color: var(--slate-2);
+    max-width: 620px;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  /* ===== TAB NAV ===== */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    margin-bottom: 32px;
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    z-index: 10;
+    padding-top: 4px;
+  }
+  .tab {
+    background: none;
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--slate-light);
+    padding: 14px 22px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--ink); font-weight: 700; }
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 3px;
+    background: var(--teal);
+  }
+  .tab .num {
+    font-size: 10px;
+    margin-right: 8px;
+    color: var(--slate-light);
+  }
+  .tab.active .num { color: var(--olive); }
+
+  /* ===== VIEWS ===== */
+  .view { display: none; animation: fade 0.4s ease; }
+  .view.active { display: block; }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ========================= */
+  /* SUMMARY VIEW */
+  /* ========================= */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .card {
+    position: relative;
+    overflow: hidden;
+    padding: 22px 24px;
+    border-radius: 2px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .card .icon {
+    position: absolute;
+    right: 14px; top: 14px;
+    opacity: 0.22;
+    pointer-events: none;
+  }
+  .card .icon svg { display: block; }
+
+  .card .big {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .card .big sup {
+    font-size: 24px;
+    font-weight: 600;
+    vertical-align: top;
+    margin-left: 4px;
+  }
+  .card .label {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    font-weight: 500;
+    margin-top: 6px;
+  }
+  .card .sublabel {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .c-teal { background: var(--teal); color: var(--cream); grid-column: span 4; }
+  .c-slate { background: var(--slate); color: var(--cream); grid-column: span 3; }
+  .c-olive { background: var(--olive); color: var(--cream); grid-column: span 5; }
+  .c-cream { background: var(--cream-2); color: var(--ink); grid-column: span 4; border: 1px solid rgba(0,0,0,0.08); }
+  .c-teal-deep { background: var(--teal-deep); color: var(--cream); grid-column: span 4; }
+  .c-slate-light { background: #b8b5a8; color: var(--ink); grid-column: span 4; }
+
+  /* Angled split card */
+  .split {
+    grid-column: span 8;
+    position: relative;
+    min-height: 150px;
+    overflow: hidden;
+    border-radius: 2px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .split .half {
+    padding: 22px 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .split .left { background: var(--slate); color: var(--cream); clip-path: polygon(0 0, 100% 0, 70% 100%, 0 100%); z-index: 2; padding-right: 60px; }
+  .split .right { background: var(--slate-light); color: var(--ink); margin-left: -40%; padding-left: 30%; }
+
+  .split2 {
+    grid-column: span 8;
+    position: relative;
+    min-height: 150px;
+    overflow: hidden;
+    border-radius: 2px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .split2 .half { padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+  .split2 .left { background: var(--olive); color: var(--cream); clip-path: polygon(0 0, 100% 0, 75% 100%, 0 100%); z-index: 2; padding-right: 50px; }
+  .split2 .right { background: var(--teal); color: var(--cream); margin-left: -30%; padding-left: 26%; }
+
+  /* Sub-divisions strip */
+  .strip {
+    background: var(--olive);
+    color: var(--cream);
+    padding: 22px 32px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    border-radius: 2px;
+    position: relative;
+  }
+  .strip::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 32px; right: 32px;
+    height: 1px;
+    background: rgba(255,255,255,0.3);
+  }
+  .strip .unit {
+    flex: 1;
+    text-align: center;
+  }
+  .strip .unit .v {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+  }
+  .strip .unit .k {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+  .strip-title {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-top: 10px;
+    opacity: 0.9;
+  }
+
+  /* Metrics footnote row */
+  .meta-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .meta-cell {
+    background: var(--white);
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 16px 18px;
+    border-radius: 2px;
+    position: relative;
+  }
+  .meta-cell .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+    margin-bottom: 8px;
+  }
+  .meta-cell .v {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .meta-cell .hint {
+    font-size: 11px;
+    color: var(--slate-2);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .meta-cell .bar {
+    position: absolute;
+    top: 0; left: 0;
+    width: 30px; height: 3px;
+    background: var(--teal);
+  }
+  .meta-cell.olive .bar { background: var(--olive); }
+  .meta-cell.red .bar { background: var(--red); }
+  .meta-cell.slate .bar { background: var(--slate); }
+
+  /* ========================= */
+  /* HIERARCHY VIEW */
+  /* ========================= */
+  .tree-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .tree-toolbar .legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate-2);
+  }
+  .tree-toolbar .legend span {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tree-toolbar .legend .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    display: inline-block;
+  }
+  .tree-controls button {
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-left: 6px;
+    transition: background 0.2s;
+  }
+  .tree-controls button:hover { background: var(--teal); }
+
+  .tree-wrap {
+    background: var(--white);
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 32px 24px;
+    border-radius: 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tree-wrap::-webkit-scrollbar { height: 10px; }
+  .tree-wrap::-webkit-scrollbar-track { background: var(--cream-2); border-radius: 2px; }
+  .tree-wrap::-webkit-scrollbar-thumb { background: var(--slate); border-radius: 2px; }
+  .tree-wrap::-webkit-scrollbar-thumb:hover { background: var(--teal); }
+
+  .tree-inner {
+    min-width: min-content;
+    display: inline-block;
+    padding: 0 20px;
+  }
+
+  .tree {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
+  .tree, .tree ul {
+    display: flex;
+    padding-top: 24px;
+    position: relative;
+    list-style: none;
+  }
+  .tree ul { padding-left: 0; }
+  .tree li {
+    text-align: center;
+    list-style-type: none;
+    position: relative;
+    padding: 24px 6px 0 6px;
+    flex-shrink: 0;
+  }
+  /* Connector lines */
+  .tree li::before, .tree li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 1px solid #b8b5a8;
+    width: 50%;
+    height: 24px;
+  }
+  .tree li::after {
+    right: auto;
+    left: 50%;
+    border-left: 1px solid #b8b5a8;
+  }
+  .tree li:only-child::after, .tree li:only-child::before { display: none; }
+  .tree li:only-child { padding-top: 0; }
+  .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+  .tree li:last-child::before {
+    border-right: 1px solid #b8b5a8;
+    border-radius: 0 4px 0 0;
+  }
+  .tree li:first-child::after { border-radius: 4px 0 0 0; }
+  .tree > li::before, .tree > li::after { display: none; }
+  .tree ul li::before { border-top-style: solid; }
+
+  /* Vertical line descending from parent */
+  .tree li > .node::before {
+    content: '';
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    width: 1px;
+    height: 24px;
+    background: #b8b5a8;
+  }
+  .tree > li > .node::before { display: none; }
+
+  .node {
+    display: inline-block;
+    padding: 10px 12px;
+    background: var(--white);
+    border: 1.5px solid var(--slate);
+    border-radius: 2px;
+    position: relative;
+    text-align: left;
+    width: 170px;
+    white-space: normal;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(.2,.8,.2,1);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+    vertical-align: top;
+  }
+  .node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    border-color: var(--teal);
+  }
+  .node .n-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .node .n-role {
+    font-size: 10.5px;
+    color: var(--slate-2);
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+  .node .n-meta {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.05em;
+  }
+  .node .n-id {
+    color: var(--slate-light);
+  }
+  .node .n-span {
+    background: var(--olive);
+    color: var(--cream);
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .node.is-root { background: var(--teal); border-color: var(--teal-deep); }
+  .node.is-root .n-name, .node.is-root .n-role { color: var(--cream); }
+  .node.is-root .n-id { color: rgba(255,255,255,0.7); }
+  .node.depth-1 { border-color: var(--olive); border-left-width: 4px; }
+  .node.depth-2 { border-color: var(--teal); border-left-width: 4px; }
+  .node.depth-3 { border-left: 4px solid var(--slate); }
+  .node.depth-4 { border-left: 4px solid var(--slate-light); background: #faf8f2; }
+  .node.is-leaf { opacity: 0.95; }
+
+  .node.collapsed .n-span::after {
+    content: ' ▸';
+  }
+
+  /* ========================= */
+  /* TABLE VIEW */
+  /* ========================= */
+  .tbl-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .tbl-toolbar input {
+    background: var(--white);
+    border: 1px solid rgba(0,0,0,0.15);
+    padding: 10px 14px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    border-radius: 2px;
+    min-width: 280px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .tbl-toolbar input:focus { border-color: var(--teal); }
+  .tbl-toolbar .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate-2);
+  }
+  .tbl-toolbar .count b { color: var(--teal); font-weight: 700; }
+
+  .tbl-wrap {
+    background: var(--white);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  table.emp {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.emp thead {
+    background: var(--ink);
+    color: var(--cream);
+  }
+  table.emp th {
+    text-align: left;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  table.emp th:hover { color: var(--olive); }
+  table.emp th .arrow { opacity: 0.4; margin-left: 4px; }
+  table.emp th.sorted .arrow { opacity: 1; color: var(--olive); }
+  table.emp tbody tr {
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    transition: background 0.15s;
+  }
+  table.emp tbody tr:hover { background: var(--cream); }
+  table.emp tbody tr:last-child { border-bottom: none; }
+  table.emp td {
+    padding: 12px 16px;
+    vertical-align: middle;
+  }
+  table.emp td.name {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  table.emp td.id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--slate-light);
+    letter-spacing: 0.03em;
+  }
+  .role-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--cream-2);
+    color: var(--slate);
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .grade-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--olive);
+    color: var(--cream);
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .depth-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .depth-pill .dd {
+    width: 18px; height: 4px;
+    background: var(--teal);
+    border-radius: 2px;
+  }
+  .span-cell {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .span-cell.zero { color: var(--slate-light); }
+  .span-cell.over { color: var(--red); }
+  .mgr-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mgr-chip .avatar {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .mgr-chip .mgr-name { font-weight: 500; }
+  .mgr-chip.none {
+    font-style: italic;
+    color: var(--slate-light);
+    font-family: 'Fraunces', serif;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .summary-grid { grid-template-columns: repeat(6, 1fr); }
+    .c-teal, .c-slate, .c-olive, .c-cream, .c-teal-deep, .c-slate-light, .split, .split2 { grid-column: span 6; }
+    .meta-row { grid-template-columns: repeat(2, 1fr); }
+    .strip { flex-wrap: wrap; }
+    .strip .unit { flex: 1 0 30%; }
+    .card .big { font-size: 44px; }
+  }
+
+  /* ===== DOWNLOAD BUTTON ===== */
+  .download-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .btn-download {
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    padding: 10px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 2px;
+  }
+  .btn-download:hover {
+    background: var(--teal);
+    transform: translateY(-1px);
+  }
+  .btn-download:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  .btn-download svg {
+    width: 14px; height: 14px;
+  }
+  .btn-download .spin {
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ===== PDF EXPORT MODE =====
+     When body has .exporting class, we force all views visible
+     and add page breaks between them. */
+  body.exporting {
+    background: var(--cream) !important;
+  }
+  body.exporting .tabs,
+  body.exporting .tree-controls,
+  body.exporting .tbl-toolbar,
+  body.exporting .download-wrap,
+  body.exporting .crumbs {
+    display: none !important;
+  }
+  body.exporting .view {
+    display: block !important;
+    animation: none !important;
+    page-break-after: always;
+    break-after: page;
+  }
+  body.exporting .view:last-of-type {
+    page-break-after: auto;
+    break-after: auto;
+  }
+  body.exporting .view#view-tree,
+  body.exporting .view#view-table {
+    padding-top: 40px;
+    border-top: 2px solid var(--ink);
+    margin-top: 40px;
+  }
+  body.exporting .view#view-tree::before,
+  body.exporting .view#view-table::before {
+    content: attr(data-export-title);
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 36px;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    color: var(--ink);
+  }
+  body.exporting .tree-wrap {
+    overflow: visible !important;
+  }
+  body.exporting .tree-inner {
+    display: block;
+  }
+  body.exporting .node {
+    box-shadow: none !important;
+  }
+  body.exporting table.emp tbody tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  body.exporting footer {
+    display: none;
+  }
+
+  /* ===== UPLOAD MODAL ===== */
+  body.awaiting-upload .shell > *:not(.upload-modal) {
+    filter: blur(8px);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .upload-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(26, 29, 32, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: modal-fade 0.3s ease;
+  }
+  @keyframes modal-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .upload-modal.hidden { display: none; }
+
+  .upload-card {
+    background: var(--cream);
+    max-width: 560px;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+    position: relative;
+    animation: modal-pop 0.4s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes modal-pop {
+    from { transform: translateY(20px) scale(0.96); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .upload-card .hero {
+    background: var(--teal);
+    color: var(--cream);
+    padding: 28px 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .upload-card .hero::before {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 140px; height: 140px;
+    background: var(--olive);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    opacity: 0.5;
+  }
+  .upload-card .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .upload-card h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    position: relative;
+    z-index: 1;
+  }
+  .upload-card h2 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--cream-2);
+  }
+  .upload-card .body {
+    padding: 24px 32px 28px;
+  }
+  .upload-card .help {
+    font-size: 13px;
+    color: var(--slate-2);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .dropzone {
+    border: 2px dashed var(--slate-light);
+    border-radius: 4px;
+    padding: 32px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--teal);
+    background: #faf8f2;
+  }
+  .dropzone.drag { transform: scale(1.01); }
+  .dropzone svg {
+    width: 40px; height: 40px;
+    color: var(--teal);
+    margin-bottom: 10px;
+  }
+  .dropzone .dz-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .dropzone .dz-sub {
+    font-size: 12px;
+    color: var(--slate-2);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+  .dropzone input { display: none; }
+
+  .preview {
+    display: none;
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--white);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 3px;
+    align-items: center;
+    gap: 14px;
+  }
+  .preview.visible { display: flex; }
+  .preview img {
+    width: 64px; height: 64px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .preview .info { flex: 1; min-width: 0; }
+  .preview .fname {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .preview .fsize {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--slate-light);
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+  .preview .remove {
+    background: none;
+    border: none;
+    color: var(--slate-light);
+    cursor: pointer;
+    font-size: 20px;
+    padding: 4px 10px;
+    font-family: 'Fraunces', serif;
+    transition: color 0.2s;
+  }
+  .preview .remove:hover { color: var(--red); }
+
+  .upload-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  .btn-analyze {
+    flex: 1;
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    padding: 14px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-analyze:hover:not(:disabled) {
+    background: var(--teal);
+    transform: translateY(-1px);
+  }
+  .btn-analyze:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .stage-indicator {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 18px;
+    padding: 16px;
+    background: var(--white);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 3px;
+  }
+  .stage-indicator.visible { display: flex; }
+  .stage {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+    transition: color 0.3s;
+  }
+  .stage.active { color: var(--ink); font-weight: 700; }
+  .stage.done { color: var(--olive); }
+  .stage .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--slate-light);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .stage.active .dot {
+    background: var(--teal);
+    box-shadow: 0 0 0 4px rgba(0, 107, 107, 0.2);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .stage.done .dot { background: var(--olive); }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(0, 107, 107, 0.2); }
+    50% { box-shadow: 0 0 0 8px rgba(0, 107, 107, 0.05); }
+  }
+
+  .error-box {
+    display: none;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: #fef2f2;
+    border-left: 3px solid var(--red);
+    color: var(--red);
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 2px;
+  }
+  .error-box.visible { display: block; }
+  .error-box b { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============================================= -->
+  <!-- UPLOAD MODAL -->
+  <!-- ============================================= -->
+  <div class="upload-modal" id="upload-modal">
+    <div class="upload-card">
+      <div class="hero">
+        <div class="kicker">Step 01 · Upload</div>
+        <h2>Feed the chart<br><em>get the dashboard.</em></h2>
+      </div>
+      <div class="body">
+        <p class="help">
+          Upload an org chart image. We'll send it through our analysis pipeline,
+          extract the hierarchy, and render this dashboard with your actual data.
+        </p>
+
+        <label class="dropzone" id="dropzone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <div class="dz-title">Drop your org chart here</div>
+          <div class="dz-sub">PNG · JPG · WEBP · up to 10MB</div>
+          <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg,image/webp"/>
+        </label>
+
+        <div class="preview" id="preview">
+          <img id="preview-img" alt="preview"/>
+          <div class="info">
+            <div class="fname" id="preview-name">—</div>
+            <div class="fsize" id="preview-size">—</div>
+          </div>
+          <button class="remove" id="preview-remove" title="Remove">×</button>
+        </div>
+
+        <div class="stage-indicator" id="stages">
+          <div class="stage" data-stage="upload">
+            <div class="dot"></div>
+            <div>Uploading image to n8n…</div>
+          </div>
+          <div class="stage" data-stage="parse">
+            <div class="dot"></div>
+            <div>Analyzing &amp; extracting hierarchy…</div>
+          </div>
+          <div class="stage" data-stage="render">
+            <div class="dot"></div>
+            <div>Rendering dashboard…</div>
+          </div>
+        </div>
+
+        <div class="error-box" id="error-box">
+          <b>Couldn't process that.</b>
+          <span id="error-msg"></span>
+        </div>
+
+        <div class="upload-actions">
+          <button class="btn-analyze" id="btn-analyze" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            <span id="analyze-label">Analyze &amp; Generate</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="brandmark">
+      <div class="bar"></div>
+      <div class="name">Org Analytics · Menu Tech</div>
+    </div>
+    <div style="display:flex; align-items:center; gap: 20px;">
+      <div class="crumbs">Portfolio <b>· Item Vista</b></div>
+      <div class="download-wrap">
+        <button class="btn-download" id="btn-download">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span id="btn-download-label">Download PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="title">Org design <em>by the numbers</em></h1>
+  <p class="subtitle">A snapshot of the Menu Data (Item Vista) portfolio — headcount, span, depth, and distribution — rendered from the latest resolved hierarchy graph.</p>
+
+  <nav class="tabs">
+    <button class="tab active" data-view="summary"><span class="num">01</span>Summary</button>
+    <button class="tab" data-view="tree"><span class="num">02</span>Hierarchy</button>
+    <button class="tab" data-view="table"><span class="num">03</span>Employees</button>
+  </nav>
+
+  <!-- ============================================= -->
+  <!-- SUMMARY -->
+  <!-- ============================================= -->
+  <section class="view active" id="view-summary">
+    <div class="summary-grid">
+
+      <!-- Headcount -->
+      <div class="card c-teal">
+        <div class="icon">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="32" cy="22" r="8"/>
+            <circle cx="18" cy="26" r="6"/>
+            <circle cx="46" cy="26" r="6"/>
+            <path d="M14 50 Q14 38 32 38 Q50 38 50 50"/>
+          </svg>
+        </div>
+        <div></div>
+        <div>
+          <div class="big" id="m-total">—</div>
+          <div class="label">Total Headcount</div>
+          <div class="sublabel" id="m-managers">— managers · — ICs</div>
+        </div>
+      </div>
+
+      <!-- Avg span -->
+      <div class="card c-cream">
+        <div class="icon" style="color: var(--slate-2)">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M32 8 L56 56 L8 56 Z"/>
+            <path d="M20 44 L44 44 M26 32 L38 32"/>
+          </svg>
+        </div>
+        <div></div>
+        <div>
+          <div class="big" style="color: var(--ink)" id="m-span">—</div>
+          <div class="label" style="color: var(--slate)">Avg. Span of Control</div>
+          <div class="sublabel" style="color: var(--slate-2)">1 : <span id="m-span-raw">—</span> direct reports</div>
+        </div>
+      </div>
+
+      <!-- Depth split -->
+      <div class="card c-olive">
+        <div class="icon">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M8 12 H56 M8 24 H48 M8 36 H40 M8 48 H32"/>
+          </svg>
+        </div>
+        <div></div>
+        <div>
+          <div class="big" id="m-depth">—<sup>layers</sup></div>
+          <div class="label">Organizational Depth</div>
+          <div class="sublabel">Diameter <span id="m-diameter">—</span> · LES <span id="m-les">—</span></div>
+        </div>
+      </div>
+
+      <!-- Split: Managers vs ICs -->
+      <div class="split">
+        <div class="half left">
+          <div class="icon" style="color: var(--cream)">
+            <svg width="56" height="56" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="32" cy="24" r="8"/>
+              <path d="M16 52 Q16 38 32 38 Q48 38 48 52"/>
+              <circle cx="48" cy="16" r="4" fill="currentColor"/>
+            </svg>
+          </div>
+          <div></div>
+          <div>
+            <div class="big" id="m-mgr-pct">—<sup>%</sup></div>
+            <div class="label">Flagged as Managers</div>
+          </div>
+        </div>
+        <div class="half right">
+          <div></div>
+          <div></div>
+          <div style="text-align:right;">
+            <div class="big" id="m-ic-pct">—<sup>%</sup></div>
+            <div class="label">Individual Contributors</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Span balance / gini -->
+      <div class="card c-slate-light">
+        <div class="icon" style="color: var(--slate)">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M8 48 L20 32 L32 40 L44 20 L56 28"/>
+            <circle cx="8" cy="48" r="2" fill="currentColor"/>
+            <circle cx="56" cy="28" r="2" fill="currentColor"/>
+          </svg>
+        </div>
+        <div></div>
+        <div>
+          <div class="big" id="m-gini">—</div>
+          <div class="label" style="color: var(--ink)">Span Gini Coefficient</div>
+          <div class="sublabel" style="color: var(--slate)">Variance <span id="m-variance">—</span></div>
+        </div>
+      </div>
+
+      <!-- Overload split -->
+      <div class="split2">
+        <div class="half left">
+          <div class="icon" style="color: var(--cream)">
+            <svg width="56" height="56" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M32 8 V36 M32 44 V52"/>
+              <circle cx="32" cy="32" r="24"/>
+            </svg>
+          </div>
+          <div></div>
+          <div>
+            <div class="big" id="m-soi">—<sup>%</sup></div>
+            <div class="label">Span Overload Index</div>
+            <div class="sublabel">Threshold &gt; 5 reports</div>
+          </div>
+        </div>
+        <div class="half right">
+          <div></div>
+          <div></div>
+          <div style="text-align:right;">
+            <div class="big" id="m-roots">—</div>
+            <div class="label">Root Node<span id="m-root-s"></span></div>
+            <div class="sublabel"><span id="m-root-name">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edges -->
+      <div class="card c-teal-deep">
+        <div class="icon">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="14" cy="16" r="4"/>
+            <circle cx="50" cy="16" r="4"/>
+            <circle cx="32" cy="48" r="4"/>
+            <path d="M14 20 L32 44 M50 20 L32 44 M18 16 L46 16"/>
+          </svg>
+        </div>
+        <div></div>
+        <div>
+          <div class="big" id="m-edges">—</div>
+          <div class="label">Reporting Edges</div>
+          <div class="sublabel"><span id="m-confidence">—</span> avg confidence</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Width-per-level strip -->
+    <div class="strip">
+      <div style="width:100%;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end;" id="width-bars"></div>
+        <div class="strip-title">Width per level — headcount by depth (L0 → L<span id="w-max"></span>)</div>
+      </div>
+    </div>
+
+    <!-- Secondary metrics row -->
+    <div class="meta-row">
+      <div class="meta-cell">
+        <div class="bar"></div>
+        <div class="k">Layer Efficiency</div>
+        <div class="v" id="k-les">—</div>
+        <div class="hint">Nodes distributed per layer (higher = flatter, more efficient).</div>
+      </div>
+      <div class="meta-cell olive">
+        <div class="bar"></div>
+        <div class="k">Span Variance</div>
+        <div class="v" id="k-var">—</div>
+        <div class="hint">Spread in how many reports each manager carries.</div>
+      </div>
+      <div class="meta-cell red">
+        <div class="bar"></div>
+        <div class="k">Overloaded Mgrs</div>
+        <div class="v" id="k-over">—</div>
+        <div class="hint">Managers with more than 5 direct reports.</div>
+      </div>
+      <div class="meta-cell slate">
+        <div class="bar"></div>
+        <div class="k">Graph Diameter</div>
+        <div class="v" id="k-diam">—</div>
+        <div class="hint">Longest undirected path between any two nodes.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================= -->
+  <!-- HIERARCHY -->
+  <!-- ============================================= -->
+  <section class="view" id="view-tree" data-export-title="Hierarchy Tree">
+    <div class="tree-toolbar">
+      <div class="legend">
+        <span><span class="dot" style="background: var(--teal)"></span> Root</span>
+        <span><span class="dot" style="background: var(--olive)"></span> L1 — Delivery</span>
+        <span><span class="dot" style="background: var(--teal)"></span> L2 — Portfolio</span>
+        <span><span class="dot" style="background: var(--slate)"></span> L3 — Leads</span>
+        <span><span class="dot" style="background: var(--slate-light)"></span> L4 — ICs</span>
+      </div>
+      <div class="tree-controls">
+        <button id="btn-expand">Expand all</button>
+        <button id="btn-collapse">Collapse L3</button>
+      </div>
+    </div>
+    <div class="tree-wrap">
+      <div class="tree-inner">
+        <ul class="tree" id="tree-root"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================= -->
+  <!-- TABLE -->
+  <!-- ============================================= -->
+  <section class="view" id="view-table" data-export-title="Employee Directory">
+    <div class="tbl-toolbar">
+      <input type="text" id="tbl-search" placeholder="Search by name, role, id, manager…"/>
+      <div class="count">Showing <b id="tbl-count">—</b> of <span id="tbl-total">—</span></div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="emp" id="emp-table">
+        <thead>
+          <tr>
+            <th data-sort="name">Employee <span class="arrow">↕</span></th>
+            <th data-sort="id">ID <span class="arrow">↕</span></th>
+            <th data-sort="role">Role <span class="arrow">↕</span></th>
+            <th data-sort="grade">Grade <span class="arrow">↕</span></th>
+            <th data-sort="manager">Manager <span class="arrow">↕</span></th>
+            <th data-sort="depth">Level <span class="arrow">↕</span></th>
+            <th data-sort="span">Span <span class="arrow">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="emp-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div>Confidential · Internal Analytics · 2026</div>
+    <div>menu-tech / item-vista · snapshot.v1</div>
+  </footer>
+</div>
+
+<script>
+// ========================================================
+// CONFIG
+// ========================================================
+const WEBHOOK_URL = 'https://n8n.srv1579407.hstgr.cloud/webhook-test/get-data';
+
+const ANALYSIS_PROMPT = [
+  'Analyze this org chart image.',
+  '- Identify all individuals and roles',
+  '- Explain reporting relationships clearly',
+  '- Describe hierarchy from top to bottom',
+  '- Do not assume missing connections'
+].join('\n');
+
+// Sample data used for the "Skip · Demo" button
+// Will be populated when n8n responds
+
+// Will be populated on load
+let data = null;
+let metrics = null;
+let V = null;
+
+// ========================================================
+// METRICS — identical logic to the provided function
+// ========================================================
+function computeMetrics(data) {
+  const edges = data.resolved_edges;
+  const children = {}, parent = {}, nodes = new Set();
+  edges.forEach(e => {
+    const u = e.manager_temp_id, v = e.employee_temp_id;
+    if (!children[u]) children[u] = [];
+    children[u].push(v);
+    parent[v] = u;
+    nodes.add(u); nodes.add(v);
+  });
+  const nodeList = Array.from(nodes);
+  const roots = nodeList.filter(n => !(n in parent));
+  const span = {};
+  nodeList.forEach(n => span[n] = children[n] ? children[n].length : 0);
+  const depth = {};
+  roots.forEach(root => {
+    const q = [[root, 0]];
+    while (q.length) {
+      const [node, d] = q.shift();
+      depth[node] = d;
+      (children[node] || []).forEach(c => q.push([c, d+1]));
+    }
+  });
+  const orgDepth = Object.values(depth).length ? Math.max(...Object.values(depth)) : 0;
+  const width = {};
+  Object.values(depth).forEach(d => width[d] = (width[d]||0)+1);
+  const managers = nodeList.filter(n => span[n] > 0);
+  const M = managers.length;
+  const avgSpan = M > 0 ? managers.reduce((s,n)=>s+span[n],0)/M : 0;
+  const spanVar = M > 0 ? managers.reduce((s,n)=>s+Math.pow(span[n]-avgSpan,2),0)/M : 0;
+  let gini = 0;
+  if (M > 0) {
+    const spans = managers.map(n=>span[n]);
+    const tot = spans.reduce((a,b)=>a+b,0);
+    if (tot > 0) {
+      let diff = 0;
+      for (let i=0;i<M;i++) for (let j=0;j<M;j++) diff += Math.abs(spans[i]-spans[j]);
+      gini = diff / (2*M*tot);
+    }
+  }
+  const T = 5;
+  const overloaded = managers.filter(n => span[n] > T).length;
+  const SOI = M > 0 ? overloaded/M : 0;
+  const LES = orgDepth > 0 ? nodeList.length/orgDepth : 0;
+
+  // Diameter via 2-BFS
+  const graph = {};
+  nodeList.forEach(n => graph[n] = []);
+  edges.forEach(e => {
+    graph[e.manager_temp_id].push(e.employee_temp_id);
+    graph[e.employee_temp_id].push(e.manager_temp_id);
+  });
+  function bfs(start) {
+    const visited = new Set([start]);
+    const q = [[start, 0]];
+    let far = start, maxD = 0;
+    while (q.length) {
+      const [n, d] = q.shift();
+      if (d > maxD) { maxD = d; far = n; }
+      graph[n].forEach(nei => {
+        if (!visited.has(nei)) { visited.add(nei); q.push([nei, d+1]); }
+      });
+    }
+    return { far, maxD };
+  }
+  let diameter = 0;
+  if (nodeList.length) {
+    const a = bfs(nodeList[0]);
+    const b = bfs(a.far);
+    diameter = b.maxD;
+  }
+
+  const avgConfidence = edges.reduce((s,e)=>s+(e.edge_confidence||0),0)/edges.length;
+
+  return {
+    basic: { total_nodes: nodeList.length, total_edges: edges.length, root_count: roots.length, roots },
+    span, depth, children, parent,
+    org_structure: { org_depth: orgDepth, width_per_level: width, layer_efficiency_score: LES, diameter },
+    management: { manager_count: M, avg_span: avgSpan, span_variance: spanVar, span_gini: gini, span_overload_index: SOI, overload_threshold: T, overloaded },
+    avg_confidence: avgConfidence
+  };
+}
+
+// ========================================================
+// UPLOAD + WEBHOOK FLOW
+// ========================================================
+const $modal = document.getElementById('upload-modal');
+const $dropzone = document.getElementById('dropzone');
+const $fileInput = document.getElementById('file-input');
+const $preview = document.getElementById('preview');
+const $previewImg = document.getElementById('preview-img');
+const $previewName = document.getElementById('preview-name');
+const $previewSize = document.getElementById('preview-size');
+const $previewRemove = document.getElementById('preview-remove');
+const $btnAnalyze = document.getElementById('btn-analyze');
+const $stages = document.getElementById('stages');
+const $errorBox = document.getElementById('error-box');
+const $errorMsg = document.getElementById('error-msg');
+const $analyzeLabel = document.getElementById('analyze-label');
+
+let selectedFile = null;
+
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(2) + ' MB';
+}
+
+function showError(msg) {
+  $errorMsg.textContent = ' ' + msg;
+  $errorBox.classList.add('visible');
+}
+function hideError() { $errorBox.classList.remove('visible'); }
+
+function setStage(key, state) {
+  document.querySelectorAll('.stage').forEach(s => {
+    if (s.dataset.stage === key) {
+      s.classList.remove('active', 'done');
+      if (state) s.classList.add(state);
+    }
+  });
+}
+
+function handleFile(file) {
+  hideError();
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showError('Please upload an image file (PNG, JPG, or WEBP).');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showError('Image is larger than 10MB. Please use a smaller file.');
+    return;
+  }
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    $previewImg.src = e.target.result;
+    $previewName.textContent = file.name;
+    $previewSize.textContent = formatBytes(file.size) + ' · ' + file.type;
+    $preview.classList.add('visible');
+    $btnAnalyze.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+$fileInput.addEventListener('change', (e) => {
+  handleFile(e.target.files[0]);
+});
+
+// Drag & drop
+['dragenter', 'dragover'].forEach(ev => {
+  $dropzone.addEventListener(ev, (e) => {
+    e.preventDefault(); e.stopPropagation();
+    $dropzone.classList.add('drag');
+  });
+});
+['dragleave', 'drop'].forEach(ev => {
+  $dropzone.addEventListener(ev, (e) => {
+    e.preventDefault(); e.stopPropagation();
+    $dropzone.classList.remove('drag');
+  });
+});
+$dropzone.addEventListener('drop', (e) => {
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    $fileInput.files = e.dataTransfer.files;
+    handleFile(file);
+  }
+});
+
+$previewRemove.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  selectedFile = null;
+  $fileInput.value = '';
+  $preview.classList.remove('visible');
+  $btnAnalyze.disabled = true;
+  hideError();
+});
+
+// Convert file to base64 (without data: prefix)
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      const comma = result.indexOf(',');
+      resolve({
+        base64: comma >= 0 ? result.substring(comma + 1) : result,
+        dataUrl: result,
+        mimeType: file.type
+      });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function analyzeAndRender() {
+  if (!selectedFile) return;
+  hideError();
+  $btnAnalyze.disabled = true;
+  $stages.classList.add('visible');
+  $analyzeLabel.textContent = 'Working…';
+
+  try {
+    // ---- Stage 1: Upload image to n8n as a real binary file ----
+    setStage('upload', 'active');
+
+    // Send as multipart/form-data — n8n's Webhook node will receive this
+    // as a binary property that OpenAI's "Analyze Image" node can use directly.
+    const form = new FormData();
+    form.append('image', selectedFile, selectedFile.name);
+    form.append('filename', selectedFile.name);
+    form.append('mime_type', selectedFile.type);
+    form.append('prompt', ANALYSIS_PROMPT);
+    form.append('timestamp', new Date().toISOString());
+
+    const resp = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      body: form
+      // Note: don't set Content-Type header manually.
+      // The browser sets it automatically with the correct multipart boundary.
+    });
+
+    setStage('upload', 'done');
+    setStage('parse', 'active');
+
+    if (!resp.ok) {
+      throw new Error(`n8n webhook returned ${resp.status} ${resp.statusText}`);
+    }
+
+    const raw = await resp.text();
+    let payload;
+    try {
+      payload = JSON.parse(raw);
+    } catch (e) {
+      throw new Error('n8n response was not valid JSON. Got: ' + raw.slice(0, 150));
+    }
+
+    // Accept several shapes n8n might return:
+    // 1) { resolved_edges, vertex_lookup }
+    // 2) [{ resolved_edges, vertex_lookup }]
+    // 3) { data: { ... } } / { json: { ... } } / { body: { ... } }
+    let hier = payload;
+    if (Array.isArray(hier)) hier = hier[0];
+    if (hier && hier.data && hier.data.resolved_edges) hier = hier.data;
+    if (hier && hier.json && hier.json.resolved_edges) hier = hier.json;
+    if (hier && hier.body && hier.body.resolved_edges) hier = hier.body;
+
+    if (!hier || !hier.resolved_edges || !hier.vertex_lookup) {
+      throw new Error('n8n response missing "resolved_edges" or "vertex_lookup". Received keys: ' +
+        Object.keys(payload || {}).join(', '));
+    }
+
+    setStage('parse', 'done');
+    setStage('render', 'active');
+
+    bootDashboard(hier);
+
+    setStage('render', 'done');
+
+    await new Promise(r => setTimeout(r, 500));
+    closeModal();
+
+  } catch (err) {
+    console.error(err);
+    showError(err.message || 'Unknown error.');
+    document.querySelectorAll('.stage').forEach(s => s.classList.remove('active', 'done'));
+    $stages.classList.remove('visible');
+    $analyzeLabel.textContent = 'Analyze & Generate';
+    $btnAnalyze.disabled = false;
+  }
+}
+
+function closeModal() {
+  $modal.classList.add('hidden');
+  document.body.classList.remove('awaiting-upload');
+}
+
+$btnAnalyze.addEventListener('click', analyzeAndRender);
+
+// ========================================================
+// DASHBOARD BOOT — run once we have hierarchy data
+// ========================================================
+function normalizeVertex(v) {
+  // Handles both the hardcoded sample shape AND the live n8n response shape.
+  // Live shape uses: badge (role), all_identifiers, all_attributes, subtitle, grade
+  // Sample shape uses: role, id, grade, unnamed
+
+  // Role: prefer explicit 'role' field, fall back to badge (strip dept suffix for cleanliness)
+  let role = v.role;
+  if (!role && v.badge) {
+    role = v.badge;
+  }
+  if (!role) {
+    // Try extracting from all_attributes
+    const roleAttr = (v.all_attributes || []).find(a => a.type === 'role');
+    if (roleAttr) role = roleAttr.value;
+  }
+  role = role || '—';
+
+  // Employee ID: prefer explicit 'id', fall back to subtitle, then all_identifiers
+  let empId = v.id || null;
+  if (!empId && v.subtitle && /^[A-Z]{2,6}\d{3,}$/.test(v.subtitle)) {
+    empId = v.subtitle;
+  }
+  if (!empId) {
+    const idEntry = (v.all_identifiers || []).find(i => i.type === 'employee_id');
+    if (idEntry) empId = idEntry.value;
+  }
+
+  // Grade: explicit field, or from all_attributes
+  let grade = v.grade || null;
+  if (!grade) {
+    const gradeAttr = (v.all_attributes || []).find(a => a.type === 'grade');
+    if (gradeAttr) grade = gradeAttr.value;
+  }
+
+  // Unnamed: if display_name matches an employee ID pattern, it's a placeholder
+  const isUnnamed = v.unnamed || /^[A-Z]{2,6}\d{3,}$/.test(v.display_name);
+
+  // Department: from dept field or parse from badge
+  const dept = v.dept || null;
+
+  return {
+    display_name: v.display_name,
+    role,
+    id: empId,
+    grade,
+    unnamed: isUnnamed,
+    dept
+  };
+}
+
+function normalizeData(raw) {
+  // Normalize vertex_lookup so all renderers get a consistent shape
+  const normalized = {};
+  for (const [key, v] of Object.entries(raw.vertex_lookup)) {
+    normalized[key] = normalizeVertex(v);
+  }
+  raw.vertex_lookup = normalized;
+
+  // If metrics already exist in the response (n8n computed them), use them.
+  // Otherwise, computeMetrics will calculate them fresh.
+  return raw;
+}
+
+function bootDashboard(hierarchyData) {
+  data = normalizeData(hierarchyData);
+  V = data.vertex_lookup;
+
+  // Use pre-computed metrics from n8n if available, otherwise compute locally
+  if (data.metrics && data.metrics.basic && data.metrics.management && data.metrics.org_structure) {
+    metrics = data.metrics;
+    // computeMetrics adds children/parent/roots/span/depth which renderers need
+    const computed = computeMetrics(data);
+    metrics.children = computed.children;
+    metrics.parent = computed.parent;
+    metrics.basic.roots = computed.basic.roots;
+    metrics.avg_confidence = computed.avg_confidence;
+    // Use pre-computed values for the fields n8n already calculated
+    metrics.span = data.metrics.span || computed.span;
+    metrics.depth = data.metrics.depth || computed.depth;
+    // Ensure overloaded count exists for the summary card
+    if (metrics.management.overloaded === undefined) {
+      const T = metrics.management.overload_threshold || 5;
+      const managers = Object.keys(metrics.span).filter(n => metrics.span[n] > 0);
+      metrics.management.overloaded = managers.filter(n => metrics.span[n] > T).length;
+    }
+  } else {
+    metrics = computeMetrics(data);
+  }
+
+  renderSummary();
+  renderTree();
+  allRows = buildTableRows();
+  renderTable();
+}
+
+// Show modal on page load
+document.body.classList.add('awaiting-upload');
+
+// ========================================================
+// SUMMARY RENDERING
+// ========================================================
+function renderSummary() {
+  const tot = metrics.basic.total_nodes;
+  const M = metrics.management.manager_count;
+  const IC = tot - M;
+
+  document.getElementById('m-total').textContent = tot;
+  document.getElementById('m-managers').textContent = `${M} managers · ${IC} ICs`;
+
+  document.getElementById('m-span').textContent = metrics.management.avg_span.toFixed(2);
+  document.getElementById('m-span-raw').textContent = metrics.management.avg_span.toFixed(2);
+
+  document.getElementById('m-depth').innerHTML = `${metrics.org_structure.org_depth + 1}<sup>layers</sup>`;
+  document.getElementById('m-diameter').textContent = metrics.org_structure.diameter;
+  document.getElementById('m-les').textContent = metrics.org_structure.layer_efficiency_score.toFixed(2);
+
+  const mgrPct = Math.round(M / tot * 100);
+  document.getElementById('m-mgr-pct').innerHTML = `${mgrPct}<sup>%</sup>`;
+  document.getElementById('m-ic-pct').innerHTML = `${100-mgrPct}<sup>%</sup>`;
+
+  document.getElementById('m-gini').textContent = metrics.management.span_gini.toFixed(2);
+  document.getElementById('m-variance').textContent = metrics.management.span_variance.toFixed(2);
+
+  const soi = Math.round(metrics.management.span_overload_index * 100);
+  document.getElementById('m-soi').innerHTML = `${soi}<sup>%</sup>`;
+
+  document.getElementById('m-roots').textContent = metrics.basic.root_count;
+  document.getElementById('m-root-s').textContent = metrics.basic.root_count === 1 ? '' : 's';
+  document.getElementById('m-root-name').textContent = metrics.basic.roots.map(r => V[r].display_name).join(', ');
+
+  document.getElementById('m-edges').textContent = metrics.basic.total_edges;
+  document.getElementById('m-confidence').textContent = (metrics.avg_confidence * 100).toFixed(0) + '%';
+
+  // Secondary
+  document.getElementById('k-les').textContent = metrics.org_structure.layer_efficiency_score.toFixed(2);
+  document.getElementById('k-var').textContent = metrics.management.span_variance.toFixed(2);
+  document.getElementById('k-over').textContent = metrics.management.overloaded;
+  document.getElementById('k-diam').textContent = metrics.org_structure.diameter;
+
+  // Width per level bars
+  const widthEl = document.getElementById('width-bars');
+  const widths = metrics.org_structure.width_per_level;
+  const maxW = Math.max(...Object.values(widths));
+  const levels = Object.keys(widths).map(Number).sort((a,b)=>a-b);
+  document.getElementById('w-max').textContent = levels[levels.length-1];
+  widthEl.innerHTML = levels.map(L => {
+    const w = widths[L];
+    const h = 20 + (w / maxW) * 60;
+    return `
+      <div style="flex:1; text-align:center; padding: 0 8px;">
+        <div style="font-family:'Fraunces',serif; font-size: 28px; font-weight: 700; margin-bottom: 4px;">${w}</div>
+        <div style="height:${h}px; background: var(--cream); border-radius: 2px; margin-bottom: 8px; opacity: 0.9;"></div>
+        <div style="font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em;">L${L}</div>
+      </div>`;
+  }).join('');
+}
+
+// ========================================================
+// HIERARCHY TREE
+// ========================================================
+function initials(name) {
+  return name.split(/\s+/).filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('');
+}
+
+function buildTreeRecursive(nodeId, depth) {
+  const v = V[nodeId];
+  const kids = metrics.children[nodeId] || [];
+  const span = metrics.span[nodeId];
+  const isRoot = depth === 0;
+  const isLeaf = kids.length === 0;
+
+  const classes = ['node', `depth-${depth}`];
+  if (isRoot) classes.push('is-root');
+  if (isLeaf) classes.push('is-leaf');
+
+  const meta = [];
+  if (v.id) meta.push(`<span class="n-id">${v.id}</span>`);
+  if (v.grade) meta.push(`<span class="n-id">${v.grade}</span>`);
+  if (span > 0) meta.push(`<span class="n-span">${span} ↓</span>`);
+
+  const nameHtml = v.unnamed
+    ? `<span style="font-style: italic; opacity: 0.8;">${v.display_name}</span>`
+    : v.display_name;
+
+  let html = `<li><div class="${classes.join(' ')}" data-id="${nodeId}">
+    <div class="n-name">${nameHtml}</div>
+    <div class="n-role">${v.role}</div>
+    <div class="n-meta">${meta.join('')}</div>
+  </div>`;
+
+  if (kids.length) {
+    html += `<ul>${kids.map(c => buildTreeRecursive(c, depth+1)).join('')}</ul>`;
+  }
+  html += `</li>`;
+  return html;
+}
+
+function renderTree() {
+  const root = metrics.basic.roots[0];
+  document.getElementById('tree-root').innerHTML = buildTreeRecursive(root, 0);
+
+  // Click to collapse/expand subtree
+  document.querySelectorAll('.node').forEach(n => {
+    n.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const li = n.parentElement;
+      const ul = li.querySelector(':scope > ul');
+      if (!ul) return;
+      const hidden = ul.style.display === 'none';
+      ul.style.display = hidden ? 'flex' : 'none';
+      n.classList.toggle('collapsed', !hidden);
+    });
+  });
+}
+
+document.getElementById('btn-expand').addEventListener('click', () => {
+  document.querySelectorAll('#tree-root ul').forEach(u => u.style.display = 'flex');
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('collapsed'));
+});
+document.getElementById('btn-collapse').addEventListener('click', () => {
+  document.querySelectorAll('.node').forEach(n => {
+    const li = n.parentElement;
+    const ul = li.querySelector(':scope > ul');
+    if (!ul) return;
+    const d = parseInt(n.className.match(/depth-(\d+)/)?.[1] || 0);
+    if (d >= 3) {
+      ul.style.display = 'none';
+      n.classList.add('collapsed');
+    } else {
+      ul.style.display = 'flex';
+      n.classList.remove('collapsed');
+    }
+  });
+});
+
+// ========================================================
+// EMPLOYEE-MANAGER TABLE
+// ========================================================
+function buildTableRows() {
+  const rows = Object.keys(V).map(id => {
+    const v = V[id];
+    const mgrId = metrics.parent[id];
+    const mgr = mgrId ? V[mgrId] : null;
+    return {
+      id,
+      name: v.display_name,
+      unnamed: v.unnamed || false,
+      emp_id: v.id || '—',
+      role: v.role,
+      grade: v.grade || '—',
+      manager: mgr ? mgr.display_name : null,
+      manager_id: mgrId,
+      depth: metrics.depth[id] ?? 0,
+      span: metrics.span[id] ?? 0
+    };
+  });
+  return rows;
+}
+
+let allRows = [];
+let sortKey = 'depth';
+let sortDir = 1;
+let filterText = '';
+
+function renderTable() {
+  const rows = allRows
+    .filter(r => {
+      if (!filterText) return true;
+      const f = filterText.toLowerCase();
+      return r.name.toLowerCase().includes(f)
+        || r.role.toLowerCase().includes(f)
+        || r.emp_id.toLowerCase().includes(f)
+        || (r.manager || '').toLowerCase().includes(f)
+        || r.grade.toLowerCase().includes(f);
+    })
+    .sort((a, b) => {
+      let av = a[sortKey], bv = b[sortKey];
+      if (av === null || av === undefined || av === '—') av = sortDir === 1 ? 'zzz' : '';
+      if (bv === null || bv === undefined || bv === '—') bv = sortDir === 1 ? 'zzz' : '';
+      if (typeof av === 'string') return sortDir * av.localeCompare(bv);
+      return sortDir * (av - bv);
+    });
+
+  document.getElementById('tbl-count').textContent = rows.length;
+  document.getElementById('tbl-total').textContent = allRows.length;
+
+  document.getElementById('emp-body').innerHTML = rows.map(r => {
+    const nameCell = r.unnamed
+      ? `<span style="font-style:italic; color: var(--slate-light);">${r.name}</span>`
+      : r.name;
+    const mgrCell = r.manager
+      ? `<div class="mgr-chip"><div class="avatar">${initials(r.manager)}</div><span class="mgr-name">${r.manager}</span></div>`
+      : `<div class="mgr-chip none">— root —</div>`;
+    const spanClass = r.span === 0 ? 'zero' : (r.span > 5 ? 'over' : '');
+    const dd = Array.from({length: r.depth + 1}).map(()=>'<span class="dd"></span>').join('');
+    return `<tr>
+      <td class="name">${nameCell}</td>
+      <td class="id">${r.emp_id}</td>
+      <td><span class="role-tag">${r.role}</span></td>
+      <td>${r.grade !== '—' ? `<span class="grade-tag">${r.grade}</span>` : '<span style="color: var(--slate-light)">—</span>'}</td>
+      <td>${mgrCell}</td>
+      <td><span class="depth-pill">${dd} L${r.depth}</span></td>
+      <td class="span-cell ${spanClass}">${r.span === 0 ? '—' : r.span + ' ↓'}</td>
+    </tr>`;
+  }).join('');
+
+  // Update sort arrows
+  document.querySelectorAll('#emp-table th').forEach(th => {
+    const k = th.dataset.sort;
+    const arr = th.querySelector('.arrow');
+    if (k === sortKey) {
+      th.classList.add('sorted');
+      arr.textContent = sortDir === 1 ? '↑' : '↓';
+    } else {
+      th.classList.remove('sorted');
+      arr.textContent = '↕';
+    }
+  });
+}
+
+document.querySelectorAll('#emp-table th').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.sort;
+    if (sortKey === k) sortDir *= -1;
+    else { sortKey = k; sortDir = 1; }
+    renderTable();
+  });
+});
+document.getElementById('tbl-search').addEventListener('input', (e) => {
+  filterText = e.target.value.trim();
+  renderTable();
+});
+
+// ========================================================
+// TAB SWITCHING
+// ========================================================
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('view-' + t.dataset.view).classList.add('active');
+  });
+});
+
+// ========================================================
+// PDF DOWNLOAD — multi-page export
+// ========================================================
+document.getElementById('btn-download').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-download');
+  const label = document.getElementById('btn-download-label');
+  const icon = btn.querySelector('svg');
+
+  btn.disabled = true;
+  label.textContent = 'Preparing…';
+  icon.classList.add('spin');
+
+  // Remember current state so we can restore it after export
+  const activeTab = document.querySelector('.tab.active')?.dataset.view || 'summary';
+
+  // Expand the whole tree so it renders fully
+  document.querySelectorAll('#tree-root ul').forEach(u => u.style.display = 'flex');
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('collapsed'));
+
+  // Enter export mode — all views visible, page breaks between them
+  document.body.classList.add('exporting');
+
+  // Let layout settle
+  await new Promise(r => setTimeout(r, 250));
+
+  const shell = document.querySelector('.shell');
+
+  const opts = {
+    margin:       [12, 10, 12, 10],
+    filename:     'org-design-report.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#f4f1e8',
+      logging: false,
+      windowWidth: shell.scrollWidth
+    },
+    jsPDF:        { unit: 'mm', format: 'a3', orientation: 'landscape' },
+    pagebreak:    { mode: ['css', 'legacy'], before: '#view-tree, #view-table' }
+  };
+
+  try {
+    await html2pdf().set(opts).from(shell).save();
+  } catch (err) {
+    console.error('PDF export failed:', err);
+    alert('Something went wrong generating the PDF. Check the console.');
+  } finally {
+    // Restore UI
+    document.body.classList.remove('exporting');
+    // Restore which tab was showing
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+    document.querySelector(`.tab[data-view="${activeTab}"]`)?.classList.add('active');
+    document.getElementById('view-' + activeTab)?.classList.add('active');
+
+    btn.disabled = false;
+    label.textContent = 'Download PDF';
+    icon.classList.remove('spin');
+  }
+});
+
+// ========================================================
+// INIT — the modal drives everything; no render until data loads
+// ========================================================
+</script>
+
+</body>
+</html>
